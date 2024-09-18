@@ -21,4 +21,9 @@ class UserBooking extends Model
     // Optionally, you can specify the primary key and timestamps if needed
     protected $primaryKey = 'book_id_pk';
     public $timestamps = true;
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id_fk', 'id');
+    }
 }

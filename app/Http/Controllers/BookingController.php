@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Mail\BookingApprovedMail;
+use App\Mail\BookingCanceledMail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -9,6 +12,9 @@ use App\Models\UserBooking;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BookingConfirmation;
 use App\Mail\BookingNotification;
+use App\Mail\BookingNotificationAdmin;
+
+
 use Illuminate\Support\Str;
 class BookingController extends Controller
 {   
@@ -29,6 +35,7 @@ class BookingController extends Controller
 
     public function updateStatus(Request $request)
     {
+        
         // Validate the request data
         $request->validate([
             'id' => 'required|exists:user_booking_table,book_id_pk', // Ensure ID exists in the user_bookings table
@@ -42,8 +49,21 @@ class BookingController extends Controller
         $booking->active_status = $request->status;
         $booking->save();
 
+         // Get the user's email
+        $userEmail = $booking->user->email;
+
+        // Send email based on the status
+        if ($request->status === 'approved') {
+            Mail::to($userEmail)->send(new BookingApprovedMail($booking));
+        } 
+        elseif ($request->status === 'canceled') {
+            Mail::to($userEmail)->send(new BookingCanceledMail($booking));
+        }
+    
         // Return a response
         return response()->json(['message' => 'Booking status updated successfully!']);
+      
+        
     }
 
 
@@ -146,7 +166,7 @@ public function bookSlot(Request $request)
 
             // Send email to admin
             $adminEmail = 'pauldipakkr@gmail.com'; // Replace with actual admin email
-            Mail::to($adminEmail)->send(new BookingNotification($booking, $userEmail));
+            Mail::to($adminEmail)->send(new BookingNotificationAdmin($booking, $userEmail));
 
             // Return a JSON response
             return response()->json(['success' => true, 'booking' => $booking]);
