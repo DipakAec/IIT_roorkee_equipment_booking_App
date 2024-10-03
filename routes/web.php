@@ -8,7 +8,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\CalenderController;
-
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 
 use Illuminate\Support\Facades\Auth;
@@ -72,6 +72,14 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/signup', [HomeController::class, 'register'])->name('register');
 Route::post('/signup', [HomeController::class, 'create'])->name('register.create');
+
+
+
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendOtp'])->name('password.email');
+Route::get('/reset-password/{otp}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('password.reset');
+Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
+
 
 Route::get('/clear-all', function() {
     Artisan::call('route:clear');

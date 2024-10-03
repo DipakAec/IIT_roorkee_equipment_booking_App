@@ -111,14 +111,16 @@
 
                                             <div class="text-center pt-1 mb-5 pb-1">
                                                 <button type="submit" class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3">Log in</button>
-                                                <a class="text-muted" href="#!">Forgot password?</a>
+                                                {{-- <a class="text-muted" href="#">Forgot password?</a> --}}
+                                                <a class="text-muted" href="{{ route('password.request') }}">Forgot password?</a>
                                             </div>
 
                                             <div class="d-flex align-items-center justify-content-center pb-4">
                                                 <p class="mb-0 me-2">Don't have an account?</p>
-                                                <a href="https://estihomebidder.com/register">
-                                                    <button type="button" class="btn btn-outline-danger">Create new</button>
+                                                <a href="{{ url('signup') }}">
+                                                    <button type="button" class="btn btn-outline-danger">Register new</button>
                                                 </a>
+                                                
                                             </div>
                                         </form>
 
