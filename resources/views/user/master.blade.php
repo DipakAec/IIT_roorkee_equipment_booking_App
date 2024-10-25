@@ -235,7 +235,7 @@
 </script><!-- start footer -->
 <div class="footer">
     <div>
-        <strong>Copyright</strong> IITR-EMS &copy; 2024    </div>
+        <strong>Copyright</strong> IITR-EMS &copy; 2024 </div>
 </div>
 </div>
 </div>

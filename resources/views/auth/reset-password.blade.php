@@ -22,6 +22,19 @@
             margin: 0 auto 20px;
             max-width: 100px; /* Adjust based on your logo size */
         }
+    
+        .message {
+            margin-top: 5px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            border: none;
+        }
+        .valid {
+            color: rgb(73, 237, 52);
+        }
+        .invalid {
+            color: rgb(241, 53, 40);
+        }
     </style>
 </head>
 <body>
@@ -57,12 +70,37 @@
                 <label for="password_confirmation">Confirm New Password:</label>
                 <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required>
             </div>
-
-            <button type="submit" class="btn btn-primary btn-block">Reset Password</button>
+            <div id="message" class="message"></div>
+            {{-- <button type="submit" class="btn btn-primary btn-block">Reset Password</button> --}}
+            <button type="submit" id="submitBtn" class="btn btn-primary btn-block" disabled>Reset Password</button>
         </form>
         <p class="text-center mt-3">
             <a href="{{ route('login') }}">Back to Login</a>
         </p>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function validatePasswords() {
+                const password = $('#password').val();
+                const confirmPassword = $('#password_confirmation').val();
+                const messageDiv = $('#message');
+                const submitBtn = $('#submitBtn');
+
+                if (password.length < 8 || confirmPassword.length < 8) {
+                    messageDiv.text('Both passwords must be at least 8 characters long.').removeClass('valid').addClass('invalid');
+                    submitBtn.prop('disabled', true);
+                } else if (password !== confirmPassword) {
+                    messageDiv.text('Passwords do not match.').removeClass('valid').addClass('invalid');
+                    submitBtn.prop('disabled', true);
+                } else {
+                    messageDiv.text('Passwords are valid.').removeClass('invalid').addClass('valid');
+                    submitBtn.prop('disabled', false);
+                }
+            }
+
+            $('#password, #password_confirmation').on('input', validatePasswords);
+        });
+    </script>
 </body>
 </html>

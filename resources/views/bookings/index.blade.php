@@ -165,7 +165,7 @@ $(document).ready(function() {
     $('.approve-btn').click(function() {
         let bookingId = $(this).data('id');
 
-        alert(bookingId);
+        // alert(bookingId);
         updateBookingStatus(bookingId, 'approved');
     });
 

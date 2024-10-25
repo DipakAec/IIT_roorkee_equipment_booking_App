@@ -55,6 +55,17 @@
                 padding-top: 50px;
                 margin: auto;
             }
+            .message {
+                margin-top: 5px;
+                font-size: 14px;
+                border: none;
+            }
+            .valid {
+                color: rgb(73, 237, 52);
+            }
+            .invalid {
+                color: rgb(241, 53, 40);
+            }
         </style>
         <a href="https://estihomebidder.com/" style="color: #fff">
             <h3>Home</h3>
@@ -80,18 +91,20 @@
                                             value="" required>
                                     </div>
                                 </div>
+                               
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="email_label">Student Email <span class="required">*</span></label>
                                         <input type="email" placeholder="Enter Email" class="form-control" name="email"
-                                            value="" required>
+                                            id="student_email" value="" required>
+                                        <div id="email_error" style="color: red; display: none;"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Password <span class="required">*</span></label>
-                                        <input type="password" placeholder="Enter Password" class="form-control"
-                                            name="password" value="" required>
+                                        <input type="password" id="password" placeholder="Enter Password" class="form-control" name="password" required>
+                                        <div id="message" class="message"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -112,18 +125,9 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Mobile Number</label>
-                                        <!-- <input type="number" placeholder="Enter Mobile number" class="form-control"
-                                            name="phone" value=""> -->
-                                            <input 
-                                                type="text" 
-                                                placeholder="Enter Mobile number" 
-                                                class="form-control" 
-                                                name="phone" 
-                                                maxlength="10" 
-                                                oninput="validatePhone(this)" 
-                                                required>
-
-
+                                        <input type="text" placeholder="Enter Mobile number" class="form-control" 
+                                            name="phone" id="student_phone" maxlength="10" required>
+                                        <div id="phone_error" style="color: red; display: none;"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -166,9 +170,16 @@
                             </div>
 
 
-                            <button class="btn btn-sm btn-primary float-right m-t-n-xs" type="submit"
-                                id="student_submit">
-                                <strong>Submit</strong></button>
+                            
+                            <button class="btn btn-lg btn-success float-right m-t-n-xs" type="submit" id="student_submit">
+                                <strong>Submit</strong>
+                            </button>
+                            
+                            <button class="btn btn-lg btn-success  m-t-n-xs" id="go_home" style="display: none;">
+                                <strong>Login</strong>
+                            </button>
+                            
+                            
                         </form>
 
                     </div>
@@ -185,6 +196,7 @@
         </div>-->
     </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         function validatePhone(input) {
             // Remove any non-digit character
@@ -195,6 +207,111 @@
                 input.value = input.value.slice(0, 10);
             }
         }
+
+        $(document).ready(function() {
+           
+            $('#password').on('input', function() {
+                const passwordLength = $(this).val().length;
+                const messageDiv = $('#message');
+
+                if (passwordLength < 8) {
+                    messageDiv.text('Password must be at least 8 characters long.').removeClass('valid').addClass('invalid');
+                } else {
+                    messageDiv.text('Password is valid.').removeClass('invalid').addClass('valid');
+                }
+            });
+        });
+
+        $(document).ready(function () {
+    $('#student_email, #student_phone').on('input', function () {
+        const email = $('#student_email').val();
+        const phone = $('#student_phone').val();
+        const emailError = $('#email_error');
+        const phoneError = $('#phone_error');
+        const submitButton = $('#student_submit');
+        const goHomeButton = $('#go_home');
+
+        // Clear previous error messages
+        emailError.text('').hide();
+        phoneError.text('').hide();
+        goHomeButton.hide(); // Hide go home button initially
+
+        let isValid = true;
+
+        // Validate email
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email && !emailPattern.test(email)) {
+            emailError.text('Please enter a valid email address.').show();
+            isValid = false;
+        }
+
+        // Validate phone number
+        const phonePattern = /^[0-9]{10}$/;
+        if (phone && !phonePattern.test(phone)) {
+            phoneError.text('Please enter a valid 10-digit mobile number.').show();
+            isValid = false;
+        }
+
+        // If either field is invalid, disable the submit button
+        if (!isValid) {
+            submitButton.prop('disabled', true);
+            return;
+        }
+
+        // AJAX request to check if email or phone number is already in use
+        $.ajax({
+            url: '/check-email-phone', // Laravel route
+            method: 'POST',
+            data: {
+                email: email,
+                phone: phone,
+                _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+            },
+            success: function (response) {
+                // Reset validity
+                isValid = true;
+
+                // If only email is entered
+                if (email && response.emailExists) {
+                    emailError.text('Email ID is already used.').show();
+                    isValid = false;
+                }
+
+                // If only phone number is entered
+                if (phone && response.phoneExists) {
+                    phoneError.text('Phone number is already used.').show();
+                    isValid = false;
+                }
+
+                // Update the submit button's enabled state
+                submitButton.prop('disabled', !isValid);
+
+                // Show or hide the Go Home button based on existence
+                if (response.emailExists || response.phoneExists) {
+                    goHomeButton.show();
+                    // submitButton.hide();
+                } else {
+                    // submitButton.show();
+                    goHomeButton.hide(); 
+                    
+                }
+            },
+            error: function () {
+                emailError.text('Error checking information.').show();
+                phoneError.text('Error checking information.').show();
+                submitButton.prop('disabled', true);
+            }
+        });
+    });
+
+    // Go to homepage button click event
+    $('#go_home').on('click', function() {
+        window.location.href = '/'; // Redirect to homepage
+    });
+});
+
+
+
 </script>
 
     <!-- Mainly scripts -->

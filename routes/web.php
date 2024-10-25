@@ -10,6 +10,9 @@ use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\CalenderController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RechargeController;
+
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
@@ -45,6 +48,21 @@ Route::middleware('auth')->group(function () {
     // Route::get('/bookings', [BookingController::class, 'index'])->name('booking.index');    
     Route::get('/bookings', [BookingController::class, 'index'])->name('booking.index');
 
+    // recharge route start
+    Route::get('/recharge', [RechargeController::class, 'list'])->name('recharge.list');
+
+    Route::get('/recharge/add', [RechargeController::class, 'add'])->name('recharge.add');
+    Route::post('/recharge/store', [RechargeController::class, 'store'])->name('recharge.store');
+    // recharge route Ends
+    // Admin profile route 
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    // Admin Profile route end
+
+    // User profile route start
+    Route::get('/user-profile', [ProfileController::class, 'userProfile'])->name('user-profile.show');
+    Route::put('/user-profile', [ProfileController::class, 'userProfileupdate'])->name('user-profile.update');
+
     // Route::resource('bookings', BookingController::class);
     Route::post('/booking/update-status', [BookingController::class, 'updateStatus'])->name('booking.update.status');
 
@@ -73,6 +91,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/signup', [HomeController::class, 'register'])->name('register');
 Route::post('/signup', [HomeController::class, 'create'])->name('register.create');
 
+Route::post('/check-email-phone', [HomeController::class, 'checkEmailAndPhone']);
 
 
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotPasswordForm'])->name('password.request');

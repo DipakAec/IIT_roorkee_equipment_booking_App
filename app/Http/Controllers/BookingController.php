@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\BookingConfirmation;
 use App\Mail\BookingNotification;
 use App\Mail\BookingNotificationAdmin;
+use App\Models\User;
 
 
 use Illuminate\Support\Str;
@@ -48,14 +49,28 @@ class BookingController extends Controller
         // Update the status
         $booking->active_status = $request->status;
         $booking->save();
-
+        // Get the user's email using the user_id_fk from the booking table
+        $user = User::find($booking->user_id_fk); // Get user by foreign key
+       
          // Get the user's email
         $userEmail = $booking->user->email;
 
         // Send email based on the status
+        // if ($request->status === 'approved') {
+        //     Mail::to($userEmail)->send(new BookingApprovedMail($booking));
+        // } 
         if ($request->status === 'approved') {
+            // Check if the user has enough amount before subtracting
+            if ($user->amount >= 100) {
+                $user->amount -= 100; // Subtract 100 from the amount
+                $user->save(); // Save the updated user
+            } else {
+                return response()->json(['message' => 'Insufficient balance to approve the booking!']);
+            }
+    
+            // Send email for approved booking
             Mail::to($userEmail)->send(new BookingApprovedMail($booking));
-        } 
+        }
         elseif ($request->status === 'canceled') {
             Mail::to($userEmail)->send(new BookingCanceledMail($booking));
         }
@@ -66,57 +81,7 @@ class BookingController extends Controller
         
     }
 
-
-// Booking slot by amit  start
-    // public function bookSlot(Request $request)
-    // {
-    //     try {
-    //         if (Auth::check()) {
-    //             $userId = Auth::id(); // Get the authenticated user's ID
-    //         } else {
-    //             return response()->json(['error' => 'User is not authenticated.'], 401);
-    //         }
-    
-    //         if (auth()->user()->hasRole('user')) {
-    //             // Validate the incoming request data
-    //             $request->validate([
-    //                 'date' => 'required|date',
-    //                 'slot' => 'required|string',
-    //             ]);
-    
-    //             $date = $request->input('date');
-    //             $slot = $request->input('slot');
-    //             $goldSelect =$request->input('goldSelect');
-                
-    //             // Check for existing booking to prevent duplicates
-    //             $existingBooking = UserBooking::where('user_id_fk', $userId)
-    //             ->where('booking_date', $date)
-    //             ->where('booking_timings', $slot)
-    //             ->first();
-
-    //             if ($existingBooking) {
-    //                 return response()->json(['error' => 'Duplicate booking found for the selected date and slot.'], 409);
-    //             }
-    //             // Create a new booking record
-    //             $booking = UserBooking::create([
-    //                 'user_id_fk' => $userId,
-    //                 // 'equipment_id_fk' => $equipmentId, // Uncomment and provide value if needed
-    //                 'booking_date' => $date,
-    //                 'booking_timings' => $slot,
-    //                 'status' => 'Booked', // Set default status or handle dynamically
-    //                 'gold_status' => $goldSelect
-    //             ]);
-    
-    //             // Return a JSON response
-    //             return response()->json(['success' => true, 'booking' => $booking]);
-    //         } else {
-    //             return response()->json(['error' => 'User does not have the required role.'], 403);
-    //         }
-    //     } catch (\Exception $e) {
-    //         return response()->json(['error' => 'Server error: ' . $e->getMessage()], 500);
-    //     }
-    // }
- // Booking slot by amit  end 
+ 
  
 //  Booking slot with mail by dipak start
 public function bookSlot(Request $request)

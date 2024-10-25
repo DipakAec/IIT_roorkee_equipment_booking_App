@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Http\Controllers\HomeController;
+// use App\Http\Controllers\HomeController;
 
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -59,5 +59,20 @@ class HomeController extends Controller
     }
     
 
+    public function checkEmailAndPhone(Request $request)
+    {
+        $request->validate([
+            'email' => 'email|nullable',
+            'phone' => 'regex:/^[0-9]{10}$/|nullable',
+        ]);
+
+        $emailExists = User::where('email', $request->email)->exists();
+        $phoneExists = User::where('phone', $request->phone)->exists();
+
+        return response()->json([
+            'emailExists' => $emailExists,
+            'phoneExists' => $phoneExists,
+        ]);
+    }
     
 }

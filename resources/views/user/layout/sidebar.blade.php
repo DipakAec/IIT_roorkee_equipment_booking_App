@@ -18,7 +18,7 @@
                     </div>
                 </li>
                 <li>
-                    <a href="#"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard</span></a>
+                    <a href="{{ route('dashboard') }}"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard</span></a>
                 </li>
                 <li>
                     <a href="{{ route('booking') }}"><i class="fa fa-th-large"></i> <span class="nav-label">Book Equipment</span></a>
@@ -39,8 +39,9 @@
                 </div>
                 <ul class="nav navbar-top-links navbar-right">
                     <li>
-                        <a href="#">
-                            <i class="fa fa-user"></i> My Account
+                        <a class="dropdown-item" href="{{ route('user-profile.show') }}">
+                            <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                            Profile
                         </a>
                     </li>
                     <li>
