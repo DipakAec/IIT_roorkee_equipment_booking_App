@@ -82,7 +82,9 @@ Route::post('equipments/update-calender', [EquipmentController::class, 'updateCa
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('login'); // Show login form
 
 // Handle the login form submission
+Route::post('/login-check', [LoginController::class, 'loginCheck'])->name('login-check');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+
 // Handle logout
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 //Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

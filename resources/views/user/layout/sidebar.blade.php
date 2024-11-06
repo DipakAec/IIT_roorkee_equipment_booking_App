@@ -40,7 +40,7 @@
                 <ul class="nav navbar-top-links navbar-right">
                     <li>
                         <a class="dropdown-item" href="{{ route('user-profile.show') }}">
-                            <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                            {{-- <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> --}}
                             Profile
                         </a>
                     </li>

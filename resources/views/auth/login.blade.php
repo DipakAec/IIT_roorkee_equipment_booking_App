@@ -138,7 +138,10 @@
                                                 style="width: 185px;" alt="logo"> <br> <br>
                                             <h4 class="mt-1 mb-5 pb-1">FESEM Booking</h4>
                                         </div>
+                                        {{-- message --}}
 
+
+                                        {{-- Message --}}
                                         <form method="POST" action="{{ route('login') }}">
                                             @csrf
 
@@ -147,7 +150,7 @@
                                                 <input type="email" id="form2Example11" class="form-control @error('email') is-invalid @enderror"
                                                     placeholder="Phone number or email address"  name="email" value="{{ old('email') }}"/>
                                                 @error('email')
-                                                    <span class="invalid-feedback" role="alert">
+                                                    <span class="invalid-email" role="alert">
                                                         <strong>{{ $message }}</strong>
                                                     </span>
                                                 @enderror
@@ -157,10 +160,10 @@
                                                 <input type="password" id="form2Example22" class="form-control @error('password') is-invalid @enderror" name="password"/>
                                                 <label class="form-label" for="form2Example22">Password</label>
                                                 @error('password')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
+                                                <span class="invalid-password" role="alert">
+                                                    <strong>{{ $message }} </strong>
                                                 </span>
-                                            @enderror
+                                                @enderror
                                             </div>
                                             <div class="text-center pt-1 mb-5 pb-1">
                                                 <button data-mdb-button-init data-mdb-ripple-init
