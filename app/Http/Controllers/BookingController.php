@@ -35,14 +35,12 @@ class BookingController extends Controller
 
 
     public function updateStatus(Request $request)
-    {
-        
+    {      
         // Validate the request data
         $request->validate([
             'id' => 'required|exists:user_booking_table,book_id_pk', // Ensure ID exists in the user_bookings table
             'status' => 'required|in:approved,canceled', // Ensure status is either approved or canceled
-        ]);
-        
+        ]);       
         // Find the booking by ID
         $booking = UserBooking::find($request->id);
 
@@ -61,8 +59,8 @@ class BookingController extends Controller
         // } 
         if ($request->status === 'approved') {
             // Check if the user has enough amount before subtracting
-            if ($user->amount >= 100) {
-                $user->amount -= 100; // Subtract 100 from the amount
+            if ($user->amount >= $booking->caculated_price) {
+                $user->amount -= $booking->caculated_price; // Subtract 100 from the amount
                 $user->save(); // Save the updated user
             } else {
                 return response()->json(['message' => 'Insufficient balance to approve the booking!']);
@@ -102,7 +100,8 @@ public function bookSlot(Request $request)
 
             $date = $request->input('date');
             $slot = $request->input('slot');
-            $goldSelect = $request->input('goldSelect');
+            $caculated_price = $request->input('caculated_price');
+            
             
             // Check for existing booking to prevent duplicates
             $existingBooking = UserBooking::where('user_id_fk', $userId)
@@ -120,7 +119,7 @@ public function bookSlot(Request $request)
                 'booking_date' => $date,
                 'booking_timings' => $slot,
                 'status' => 'Booked',
-                'gold_status' => $goldSelect,
+                'caculated_price' => $caculated_price,
                 'ref_no' => Str::random(8) // Generate random 8-character alphanumeric string
 
             ]);
@@ -167,8 +166,6 @@ public function bookSlot(Request $request)
                 '7:30 PM - 9:00 PM'
             ];
 
-           
-
             // Fetch records for the current week from user_booking_table
             $booked_data = DB::table('user_booking_table')
                     ->whereBetween('booking_date', [$startOfWeek, $endOfWeek])
@@ -181,6 +178,8 @@ public function bookSlot(Request $request)
                     ->whereIn('timings', $timeSlots)
                     ->get();    
                    
+                     // Get the logged-in user's data
+                     $user = auth()->user();
             // Pass the data to the view
             return view('user.booking', [
                 'equiptment_data' => $equiptment_data,
@@ -188,7 +187,8 @@ public function bookSlot(Request $request)
                 'startOfWeek' => $startOfWeek,
                 'endOfWeek' => $endOfWeek,
                 'timezone' => $timezone,
-                'booked_data' =>$booked_data
+                'booked_data' =>$booked_data,
+                'user' => $user
             ]);
 
         } else {

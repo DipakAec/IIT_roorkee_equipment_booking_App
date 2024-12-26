@@ -59,6 +59,11 @@ return [
             'driver' => 'local',
             'root' => public_path('website'),
         ],
+        'uploads' => [
+        'driver' => 'local',
+        'root' => public_path('uploads'), // This will store files in the 'public/uploads' folder
+        'visibility' => 'public',
+    ],
 
     ],
 

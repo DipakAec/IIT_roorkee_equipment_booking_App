@@ -45,44 +45,71 @@ class ProfileController extends Controller
     {
         // Fetch the authenticated user's profile
         $user = auth()->user();
+        // dd($user);
         return view('user.user-profile.profile', compact('user'));
     }
 
     public function userProfileupdate(Request $request)
     {
         $user = auth()->user();
-
+    
         // Validate the request
         $request->validate([
             'name' => 'nullable|string|max:255',
-            // 'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'emp_id' => 'nullable|string|max:50', // Adjust validation as needed
+            'password' => 'nullable|string|min:8', // You can change this to 'required|confirmed|min:8' if password confirmation is used
+            'enroll_number' => 'nullable|string|max:255',
+            'institute_type' => 'nullable|string|max:255',
             'department' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:15', // Adjust max length as needed
-            'program_id' => 'nullable|string|max:50', // Adjust as needed
+            'phone' => 'nullable|numeric|digits:10', // Assuming phone number length
+            'program_id' => 'nullable|string',
             'supervisior_name' => 'nullable|string|max:255',
             'supervisior_dept' => 'nullable|string|max:255',
             'supervisior_email' => 'nullable|email|max:255',
-            'password' => 'nullable|string|min:6',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validate image files
         ]);
-        // dd($request->name);
+    
         // Update user details
         $user->name = $request->name;
-        $user->enroll_number = $request->emp_id;
-        $user->department = $request->department;
-        $user->phone = $request->phone;
+        $user->enroll_number = $request->enroll_number;
+        $user->institute_type = $request->institute_type;
         $user->program = $request->program_id;
         $user->supervisior_name = $request->supervisior_name;
         $user->supervisior_dept = $request->supervisior_dept;
         $user->supervisior_email = $request->supervisior_email;
-
+        $user->department = $request->department;
+        $user->phone = $request->phone;
+    
         // Update password if provided
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
-
+    
+        if ($request->hasFile('profile_picture')) {
+            // Get the uploaded image file
+            $image = $request->file('profile_picture');
+            
+            // Generate a unique name for the uploaded image
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            
+            // Define the upload location (use storage_path and symlink if required)
+            $location = public_path('/uploads/profile_pictures/');
+            
+            // Ensure the directory exists
+            if (!file_exists($location)) {
+                mkdir($location, 0777, true); // Create the directory if it doesn't exist
+            }
+    
+            // Move the image to the uploads directory
+            $image->move($location, $imageName);
+    
+            // Save the profile picture filename in the user model
+            $user->profile_picture = $imageName;
+        }
+    
+        // Save the updated user model
         $user->save();
-
+    
+        // Redirect back with a success message
         return redirect()->route('user-profile.show')->with('success', 'Profile updated successfully.');
     }
 }

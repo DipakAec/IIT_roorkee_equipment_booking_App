@@ -30,6 +30,7 @@ class User extends Authenticatable
         'phone',
         'enroll_number',
         'program',
+        'institute_type',
         'department',
         'supervisior_name',
         'supervisior_dept',

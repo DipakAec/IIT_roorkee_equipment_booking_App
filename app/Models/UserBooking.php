@@ -15,7 +15,7 @@ class UserBooking extends Model
         'booking_timings',
         'ref_no',
         'status',
-        'gold_status'
+        'caculated_price'
     ];
 
     // Optionally, you can specify the primary key and timestamps if needed
